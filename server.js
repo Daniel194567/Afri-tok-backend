@@ -1,0 +1,39 @@
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import pkg from "pg";
+
+dotenv.config();
+const { Pool } = pkg;
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// ✅ connexion à Supabase / PostgreSQL
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
+
+// ✅ route test
+app.get("/", (req, res) => {
+  res.send("🚀 Afri-Tok Backend en ligne avec Render !");
+});
+
+// ✅ exemple route API
+app.get("/api/test", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW()");
+    res.json({ status: "success", time: result.rows[0].now });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: "error", message: err.message });
+  }
+});
+
+// ✅ port dynamique pour Render
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Serveur Afri-Tok actif sur le port ${PORT}`);
+});
