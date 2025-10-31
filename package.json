@@ -1,0 +1,21 @@
+{
+  "name": "afri-tok-backend",
+  "version": "1.0.0",
+  "description": "Backend Afri-Tok - API pour courtes vidéos",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo 'no build step needed'"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "pg": "^8.11.1"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "author": "Daniel",
+  "license": "MIT"
+}
