@@ -34,6 +34,33 @@ app.get("/api/test", async (req, res) => {
 
 // ✅ port dynamique pour Render
 const PORT = process.env.PORT || 3000;
+// Test de connexion à Supabase
+app.get("/test-supabase", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("articles") // Remplace "articles" par le vrai nom de ta table
+      .select("*")
+      .limit(1);
+
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      res.status(200).json({
+        message: "✅ Connexion Supabase réussie !",
+        exemple: data[0],
+      });
+    } else {
+      res.status(200).json({
+        message: "✅ Connexion réussie, mais aucun article trouvé.",
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      message: "❌ Erreur de connexion à Supabase.",
+      details: err.message,
+    });
+  }
+});
 app.listen(PORT, () => {
   console.log(`✅ Serveur Afri-Tok actif sur le port ${PORT}`);
 });
