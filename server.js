@@ -9,27 +9,35 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const PORT = process.env.PORT || 10000;
+
 // Initialisation Supabase
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
-// Route test
-app.get("/", (req, res) => {
-  res.json({ message: "✅ Serveur AfriTok opérationnel !" });
-});
-
-// Test de connexion Supabase
+// Endpoint de test Supabase
 app.get("/test-supabase", async (req, res) => {
   try {
-    const { data, error } = await supabase.from("users").select("*").limit(1);
+    const { data, error } = await supabase
+      .from("test_table") // remplace par une table existante
+      .select("*")
+      .limit(1);
+
     if (error) throw error;
-    res.json({ message: "✅ Connexion Supabase réussie", data });
+
+    res.json({ success: true, data });
   } catch (err) {
-    res.status(500).json({ message: "❌ Erreur de connexion à Supabase.", details: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// Port
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Serveur lancé sur le port ${PORT}`));
+// Simple endpoint pour vérifier que le serveur tourne
+app.get("/", (req, res) => {
+  res.send("Afri-Tok backend en ligne !");
+});
+
+app.listen(PORT, () => {
+  console.log(`✅ Afri-Tok backend actif sur le port ${PORT}`);
+});
