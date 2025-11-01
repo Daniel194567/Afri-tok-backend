@@ -1,4 +1,39 @@
 import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import { createClient } from "@supabase/supabase-js";
+
+dotenv.config();
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+// 🔥 Initialisation Supabase
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
+
+// 🔍 Route de test pour vérifier la connexion
+app.get("/test-supabase", async (req, res) => {
+  try {
+    // simple test pour vérifier la communication
+    const { data, error } = await supabase.from("profiles").select("*").limit(1);
+    if (error) throw error;
+    res.json({ message: "✅ Connexion à Supabase réussie", data });
+  } catch (err) {
+    res.status(500).json({
+      message: "❌ Erreur de connexion à Supabase.",
+      details: err.message,
+    });
+  }
+});
+
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`✅ Serveur Afri-Tok actif sur le port ${PORT}`);
+});import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import pkg from "pg";
