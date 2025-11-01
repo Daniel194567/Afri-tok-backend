@@ -1,43 +1,39 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { createClient } from "@supabase/supabase-js";
+import pkg from "pg";
 
 dotenv.config();
+const { Pool } = pkg;
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 10000;
+// ✅ connexion à Supabase / PostgreSQL
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
 
-// Initialisation Supabase
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+// ✅ route test
+app.get("/", (req, res) => {
+  res.send("🚀 Afri-Tok Backend en ligne avec Render !");
+});
 
-// Endpoint de test Supabase
-app.get("/test-supabase", async (req, res) => {
+// ✅ exemple route API
+app.get("/api/test", async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("test_table") // remplace par une table existante
-      .select("*")
-      .limit(1);
-
-    if (error) throw error;
-
-    res.json({ success: true, data });
+    const result = await pool.query("SELECT NOW()");
+    res.json({ status: "success", time: result.rows[0].now });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error(err);
+    res.status(500).json({ status: "error", message: err.message });
   }
 });
 
-// Simple endpoint pour vérifier que le serveur tourne
-app.get("/", (req, res) => {
-  res.send("Afri-Tok backend en ligne !");
-});
-
+// ✅ port dynamique pour Render
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Afri-Tok backend actif sur le port ${PORT}`);
+  console.log(`✅ Serveur Afri-Tok actif sur le port ${PORT}`);
 });
